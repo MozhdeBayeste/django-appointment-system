@@ -20,8 +20,8 @@
   <form method="post" class="hidden" id="signupForm">
     {% csrf_token %}
     <div>
-      <label class="block text-sm font-medium text-gray-600">نام کاربری</label>
-      <input type="text" name="username" class="w-full border rounded p-2 focus:outline-none focus:ring" placeholder="نام کاربری" required>
+      <label class="block text-sm font-medium text-gray-600">نام و نام خانوادگی </label>
+      <input type="text" name="fullname" class="w-full border rounded p-2 focus:outline-none focus:ring" placeholder="نام " required>
     </div>
     <div>
       <label class="block text-sm font-medium text-gray-600">رمز عبور</label>
@@ -38,8 +38,8 @@
   <form method="post" class="space-y-4" id="loginForm">
     {% csrf_token %}
     <div>
-      <label class="block text-sm font-medium text-gray-600">نام کاربری</label>
-      <input type="text" name="chusername" class="w-full border rounded p-2 focus:outline-none focus:ring" placeholder="نام کاربری" required>
+      <label class="block text-sm font-medium text-gray-600">شماره تماس </label>
+      <input type="text" name="chphonenumber" class="w-full border rounded p-2 focus:outline-none focus:ring" placeholder="0912..." required>
     </div>
     <div>
       <label class="block text-sm font-medium text-gray-600">رمز عبور</label>

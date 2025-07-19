@@ -8,7 +8,6 @@ class ConsultantProfile(models.Model):
     phoneNumber = models.CharField(max_length=15)
     createdTime = models.DateTimeField(auto_now_add=True)
     specialty = models.CharField(max_length=30)
-    experience_years = models.PositiveIntegerField()
     is_active = models.BooleanField(default=True)
 
 

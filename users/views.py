@@ -4,16 +4,13 @@ from django.views import View
 from .models import UserProfile 
 from consultant.models import ConsultantProfile
 from django.contrib.auth.hashers import check_password , make_password
-from django.forms.models import model_to_dict
 import re
 
 
 def is_logged(request):
-    sess = request.session.get("user")
-    if sess and "username" in sess:
-        if UserProfile.objects.filter(username=sess["username"]).exists():
-            return 1
-    return 0
+    user_id = request.session.get("user_id")
+    return UserProfile.objects.filter(id=user_id).exists() if user_id else False
+
 
 # user , 12345678
 class RegistrationView(View):
@@ -35,15 +32,19 @@ class RegistrationView(View):
             elif UserProfile.objects.filter(username=username).exists() or UserProfile.objects.filter(phoneNumber=phonenumber).exists():
                 msg = 'نام کاربری / شماره تلفن قبلا استفاده شده است'
             
-            elif len(password) < 8 or re.search(r"[؟،!\-+=@#$]", password):
-                msg = "رمز عبور نباید از هشت کارکتر کمتر و شامل کاراکترهای خاص مانند ؟ ، ! - + = @ # $ باشد."
+            elif (len(password) < 8 or
+                  not re.search(r"[a-zA-Z]", password) or      
+                  not re.search(r"\d", password)): 
+                msg = ("رمز عبور باید حداقل ۸ کاراکتر باشد و شامل حداقل یک حرف، "
+                       "یک عدد باشد.")
             
             else:
-                UserProfile.objects.create(
+                user = UserProfile.objects.create(
                     username=username,
                     password=make_password(password),  
                     phoneNumber=phonenumber
                 )
+                request.session["user_id"] = user.id
                 msg = 'حساب کاربری با موفقیت ایجاد شد'
             
             return render(request, 'users/reg.html', {'msg': msg})
@@ -60,8 +61,7 @@ class RegistrationView(View):
             user = UserProfile.objects.filter(username=username).first()
 
             if user and check_password(password, user.password):
-                user_data = model_to_dict(user, fields=["username", "email", "fullname", "phoneNumber"])
-                request.session["user"] = user_data
+                request.session["user_id"] = user.id  
                 request.session.modified = True
                 #return redirect() main page
                 return render(request, 'users/reg.html', {'msg': 'با موفقیت وارد شدید'}) 
@@ -78,8 +78,8 @@ class UserUpdateView(View):
     def get(self,request):
         if not is_logged(request) :
             return redirect("login")
-        user_data = request.session.get("user")
-        user=UserProfile.objects.filter(username=user_data.get("username")).first()
+        
+        user = UserProfile.objects.filter(id=request.session.get("user_id")).first()
         if not user:
             return render(request, 'users/update.html',{'msg':'کاربری پیدا نشد'})
             
@@ -88,8 +88,8 @@ class UserUpdateView(View):
     def post(self,request):
         if not is_logged(request) :
             return redirect("login")
-        user_data = request.session.get("user")
-        user=UserProfile.objects.filter(username=user_data.get("username")).first()
+        
+        user = UserProfile.objects.filter(id=request.session.get("user_id")).first()
         if not user:
             msg='کاربری پیدا نشد'
 
@@ -105,11 +105,15 @@ class UserUpdateView(View):
         elif username !=  user.username and UserProfile.objects.filter(username=username).exists():
             msg= "این نام کاربری قبلاً استفاده شده است."
         
-        elif password:
-            if len(password) < 8 or re.search(r"[؟،!\-+=@#$]", password):
-                msg = "رمز عبور نباید از هشت کارکتر کمتر و شامل کاراکترهای خاص مانند ؟ ، ! - + = @ # $ باشد."
-            elif password != confirm_password:
-                msg = "رمز عبور با تکرار آن مطابقت ندارد."
+        if password:
+            if (len(password) < 8 or
+                not re.search(r"[a-zA-Z]", password) or
+                not re.search(r"\d", password)):
+                    msg = ("رمز عبور باید حداقل ۸ کاراکتر باشد و شامل حداقل یک حرف، "
+                            "یک عدد باشد.")
+        if password != confirm_password:
+            msg = "رمز عبور با تکرار آن مطابقت ندارد."
+
 
         elif email !=  user.email and UserProfile.objects.filter(email=email).exists():
             msg="این ایمیل قبلاً استفاده شده است."
@@ -126,12 +130,6 @@ class UserUpdateView(View):
                 user.password = make_password(password)
 
             user.save()
-            request.session["user"].update({
-                "username": username,
-                "email": email,
-                "phoneNumber": phonenumber,
-                "fullname": fullname
-            })
             msg = "اطلاعات با موفقیت بروزرسانی شد"
 
         return render(request, 'users/update.html',{'user':user , 'msg':msg})
