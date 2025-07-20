@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect , get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.views import View
 from .models import ConsultantProfile ,AvailableTime
@@ -25,6 +25,8 @@ class RegistrationView(View):
             fullname = request.POST.get('fullname')
             password = request.POST.get('password')
             phonenumber = request.POST.get('phoneNumber')
+            confirm_password = request.POST.get("confirm_password")
+
 
             if not (fullname and password and phonenumber):
                 msg = 'لطفا تمامی فیلد ها را پر کنید'
@@ -32,12 +34,16 @@ class RegistrationView(View):
             elif ConsultantProfile.objects.filter(phoneNumber=phonenumber).exists():
                 msg = ' شماره تلفن قبلا استفاده شده است'
             
-            elif (len(password) < 8 or
-                  not re.search(r"[a-zA-Z]", password) or      
-                  not re.search(r"\d", password) or            
-                  not re.search(r"[؟،!\\\-+=@#$]", password)): 
-                msg = ("رمز عبور باید حداقل ۸ کاراکتر باشد و شامل حداقل یک حرف، "
-                       "یک عدد و یک کاراکتر خاص مانند ؟ ، ! - + = @ # $ باشد.")
+            if password:
+                if (len(password) < 8 or
+                not re.search(r"[a-zA-Z]", password) or
+                not re.search(r"\d", password) or
+                not re.search(r"[؟،!\\\-+=@#$]", password)):
+                    msg = ("رمز عبور باید حداقل ۸ کاراکتر باشد و شامل حداقل یک حرف، "
+                            "یک عدد و یک کاراکتر خاص مانند ؟ ، ! - + = @ # $ باشد.")
+
+            if password != confirm_password:
+                msg = "رمز عبور با تکرار آن مطابقت ندارد."
             
             else:
                 consultant=ConsultantProfile.objects.create(
@@ -78,7 +84,7 @@ class ConsultantUpdateView(View):
 
     def get(self,request):
         if not is_logged(request) :
-            return redirect("login_consultant")
+            return redirect("consultant-login")
         consultant = ConsultantProfile.objects.filter(id=request.session.get("consultant_id")).first()
         if not consultant:
             return render(request, 'consultant/update.html',{'msg':'کاربری پیدا نشد'})
@@ -87,7 +93,7 @@ class ConsultantUpdateView(View):
     
     def post(self,request):
         if not is_logged(request) :
-            return redirect("login_consultant")
+            return redirect("consultant-login")
         consultant = ConsultantProfile.objects.filter(id=request.session.get("consultant_id")).first()
         if not consultant:
             msg='کاربری پیدا نشد'
@@ -112,12 +118,6 @@ class ConsultantUpdateView(View):
 
         if password != confirm_password:
             msg = "رمز عبور با تکرار آن مطابقت ندارد."
-        
-        elif password:
-            if len(password) < 8 or re.search(r"[؟،!\-+=@#$]", password):
-                msg = "رمز عبور نباید از هشت کارکتر کمتر و شامل کاراکترهای خاص مانند ؟ ، ! - + = @ # $ باشد."
-            elif password != confirm_password:
-                msg = "رمز عبور با تکرار آن مطابقت ندارد."
 
         elif email !=  consultant.email and ConsultantProfile.objects.filter(email=email).exists():
             msg="این ایمیل قبلاً استفاده شده است."
@@ -146,13 +146,13 @@ class ConsultantUpdateView(View):
 class AddAvailableTimeView(View):
     def get(self, request):
         if not is_logged(request) :
-            return redirect("login_consultant")
+            return redirect("consultant-login")
         consultant = ConsultantProfile.objects.filter(id=request.session.get("consultant_id")).first()
         return render(request, 'consultant/addconsultantavailabletime.html', {'consultant': consultant})
 
     def post(self, request):
         if not is_logged(request) :
-            return redirect("login_consultant")
+            return redirect("consultant-login")
         consultant = ConsultantProfile.objects.filter(id=request.session.get("consultant_id")).first()
         start_time = request.POST.get('start_time')
         end_time = request.POST.get('end_time')
@@ -174,7 +174,23 @@ class AddAvailableTimeView(View):
         else:
             msg = "لطفاً تمام فیلدهای ضروری را پر کنید."
 
-        return render(request, 'consultant/addconsultantavailabletime.html', {
-            'consultant': consultant,
-            'msg': msg
-        })
+        return render(request, 'consultant/addconsultantavailabletime.html', {'consultant': consultant,'msg': msg})
+    
+class ConsultantProfileView(View):
+    def get(self, request, pk):
+        consultant = ConsultantProfile.objects.filter(id=pk , is_active=True).first()
+        if not consultant:
+            return render(request, 'consultant/consultantprofile.html', {'msg': 'مشاوری یافت نشد'})
+        return render(request, 'consultant/consultantprofile.html', {'consultant': consultant})
+    
+class ConsultantDashboardView(View):
+    def get(self, request):
+        if not is_logged(request):
+            return redirect("consultant-login")
+
+        consultant_id = request.session.get('consultant_id')
+        consultant =ConsultantProfile.objects.filter(id=consultant_id).first()
+        if not consultant:
+            return render(request, 'consultant/dashboard.html', {'msg':'مشاوری یافت نشد'})
+
+        return render(request, 'consultant/dashboard.html', {'fullname':consultant.full_name})

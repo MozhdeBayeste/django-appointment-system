@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>پروفایل مشاور</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-100 to-white min-h-screen flex items-center justify-center">
+
+  <div class="max-w-3xl w-full bg-white rounded-2xl shadow-xl p-8 space-y-6">
+    <div class="text-center">
+      <h2 class="text-3xl font-extrabold text-blue-700">پروفایل مشاور</h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-lg text-gray-700">
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-blue-600">نام کامل:</span>
+        <span>{{ consultant.full_name }}</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-blue-600">ایمیل:</span>
+        <span>{{ consultant.email|default:"—" }}</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-blue-600">شماره تماس:</span>
+        <span>{{ consultant.phoneNumber }}</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-blue-600">تخصص:</span>
+        <span>{{ consultant.specialty }}</span>
+      </div>
+
+      <div class="flex items-center gap-3 col-span-2">
+        <span class="font-bold text-blue-600">تاریخ عضویت:</span>
+        <span>{{ consultant.createdTime|date:"Y/m/d" }}</span>
+      </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row justify-between gap-4 mt-8">
+      <a href="{% url 'home' %}" class="w-full md:w-auto text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition">
+        بازگشت به صفحه اصلی
+      </a>
+
+      <a href="" class="w-full md:w-auto text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+        دیدن نوبت‌های مشاور
+        {% comment %} {% url 'consultant-available-times' consultant.id %} {% endcomment %}
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>
+

@@ -3,7 +3,7 @@ from users.models import UserProfile
 from consultant.models import ConsultantProfile ,  AvailableTime
 
 
-class Session(models.Model):
+class Appointmnet(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     consultant = models.ForeignKey(ConsultantProfile, on_delete=models.CASCADE)
     available_time = models.OneToOneField(AvailableTime, on_delete=models.CASCADE) 

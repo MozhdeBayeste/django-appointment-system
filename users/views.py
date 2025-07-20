@@ -25,6 +25,8 @@ class RegistrationView(View):
             username = request.POST.get('username')
             password = request.POST.get('password')
             phonenumber = request.POST.get('phoneNumber')
+            confirm_password = request.POST.get("confirm_password")
+
 
             if not (username and password and phonenumber):
                 msg = 'لطفا تمامی فیلد ها را پر کنید'
@@ -32,11 +34,16 @@ class RegistrationView(View):
             elif UserProfile.objects.filter(username=username).exists() or UserProfile.objects.filter(phoneNumber=phonenumber).exists():
                 msg = 'نام کاربری / شماره تلفن قبلا استفاده شده است'
             
-            elif (len(password) < 8 or
-                  not re.search(r"[a-zA-Z]", password) or      
-                  not re.search(r"\d", password)): 
-                msg = ("رمز عبور باید حداقل ۸ کاراکتر باشد و شامل حداقل یک حرف، "
-                       "یک عدد باشد.")
+            if password:
+                if (len(password) < 8 or
+                    not re.search(r"[a-zA-Z]", password) or
+                    not re.search(r"\d", password) or
+                    not re.search(r"[؟،!\\\-+=@#$]", password)):
+                    msg = ("رمز عبور باید حداقل ۸ کاراکتر باشد و شامل حداقل یک حرف، "
+                            "یک عدد و یک کاراکتر خاص مانند ؟ ، ! - + = @ # $ باشد.")
+
+            if password != confirm_password:
+                msg = "رمز عبور با تکرار آن مطابقت ندارد."
             
             else:
                 user = UserProfile.objects.create(
@@ -77,7 +84,7 @@ class UserUpdateView(View):
 
     def get(self,request):
         if not is_logged(request) :
-            return redirect("login")
+            return redirect("user-login")
         
         user = UserProfile.objects.filter(id=request.session.get("user_id")).first()
         if not user:
@@ -87,7 +94,7 @@ class UserUpdateView(View):
     
     def post(self,request):
         if not is_logged(request) :
-            return redirect("login")
+            return redirect("user-login")
         
         user = UserProfile.objects.filter(id=request.session.get("user_id")).first()
         if not user:
@@ -133,3 +140,15 @@ class UserUpdateView(View):
             msg = "اطلاعات با موفقیت بروزرسانی شد"
 
         return render(request, 'users/update.html',{'user':user , 'msg':msg})
+
+class UserDashboardView(View):
+    def get(self, request):
+        if not is_logged(request):
+            return redirect("user-login")
+
+        user_id = request.session.get('user_id')
+        user =UserProfile.objects.filter(id=user_id).first()
+        if not user:
+            return render(request, 'users/dashboard.html', {'msg':'کاربری یافت نشد'})
+
+        return render(request, 'users/dashboard.html', {'fullname':user.fullname})

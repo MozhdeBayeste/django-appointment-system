@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>داشبورد مشاور</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          const welcome = document.getElementById("welcome-text");
+          welcome.classList.add("opacity-0", "translate-y-4");
+          setTimeout(() => {
+              welcome.classList.remove("opacity-0", "translate-y-4");
+              welcome.classList.add("opacity-100", "translate-y-0");
+          }, 200);
+      });
+    </script>
+</head>
+<body class="bg-slate-100 min-h-screen px-4 py-6">
+
+    <div class="max-w-3xl mx-auto bg-white p-6 rounded-2xl shadow-lg">
+        <!-- خوش‌آمدگویی -->
+        <div id="welcome-text" class="transition-all duration-700 text-center mb-8">
+            <h2 class="text-3xl font-bold text-emerald-700">سلام {{ fullname }} 👋</h2>
+            <p class="text-gray-600 mt-2">به پنل مشاوره‌ات خوش اومدی</p>
+        </div>
+
+        <!-- دکمه‌های کاربردی -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center">
+            <a href="" class="bg-teal-500 hover:bg-teal-600 text-white py-4 px-4 rounded-xl shadow-md transition-all duration-300">
+                {% comment %} {% url 'consultant-edit-profile' %} {% endcomment %}
+                ویرایش پروفایل
+            </a>
+            <a href="" class="bg-orange-500 hover:bg-orange-600 text-white py-4 px-4 rounded-xl shadow-md transition-all duration-300">
+                {% comment %} {% url 'consultant-free-times' %} {% endcomment %}
+                افزودن وقت آزاد
+            </a>
+            <a href="" class="bg-cyan-500 hover:bg-cyan-600 text-white py-4 px-4 rounded-xl shadow-md transition-all duration-300">
+                {% comment %} {% url 'consultant-reserved-sessions' %} {% endcomment %}
+                نوبت‌های رزرو شده
+            </a>
+        </div>
+
+        <!-- بازگشت به صفحه اصلی -->
+        <div class="text-center mt-10">
+            <a href="{% url 'home' %}" class="text-sm text-gray-600 hover:text-gray-800 underline">
+                بازگشت به صفحه اصلی
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
+

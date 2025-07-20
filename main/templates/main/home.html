@@ -1,0 +1,121 @@
+{% comment %} <!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>سامانه نوبت‌دهی مشاوره</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col justify-center items-center p-4">
+
+    <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-lg text-center">
+        <h1 class="text-3xl font-bold text-blue-700 mb-4">سامانه نوبت‌دهی مشاوره</h1>
+        <p class="text-gray-700 mb-6">لطفاً نقش خود را انتخاب کنید</p>
+
+        <div class="grid grid-cols-1 gap-4">
+            <a href="{% url 'user-login' %}"
+               class="bg-blue-500 text-white py-3 rounded-xl hover:bg-blue-600 transition">
+               ورود کاربران
+            </a>
+            <a href="{% url 'consultant-login' %}"
+               class="bg-green-500 text-white py-3 rounded-xl hover:bg-green-600 transition">
+               ورود مشاوران
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // انیمیشن ساده هنگام ورود به صفحه
+        $(document).ready(function(){
+            $("body").hide().fadeIn(500);
+        });
+    </script>
+
+</body>
+</html> {% endcomment %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>سامانه نوبت‌دهی مشاوره</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <style>
+    body {
+      font-family: 'Vazir', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 via-blue-50 to-purple-100 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-white shadow-md py-4 px-6 flex justify-between items-center">
+    <h1 class="text-2xl font-extrabold text-indigo-700">سامانه نوبت‌دهی مشاوره</h1>
+    <div class="space-x-4">
+      <a href="{% url 'user-login' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl transition duration-300">
+        ورود کاربر
+      </a>
+      <a href="{% url 'consultant-login' %}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl transition duration-300">
+        ورود مشاور
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="text-center py-10 px-4">
+    <h2 class="text-3xl md:text-4xl font-bold text-indigo-800 mb-4 animate-fade-in">
+      مشاور مورد نظر خود را پیدا کنید
+    </h2>
+    <p class="text-gray-700 text-lg">ما به شما کمک می‌کنیم تا بهترین مشاور را با توجه به نیازتان انتخاب و نوبت رزرو کنید.</p>
+  </section>
+
+  <!-- Search -->
+  <section class="px-6 mb-10 flex flex-col sm:flex-row justify-center items-center gap-4">
+    <form method="get" class="w-full sm:w-2/3 flex flex-col sm:flex-row gap-3">
+      <input type="text" name="q" placeholder="جستجو بر اساس نام یا تخصص..."
+             value="{{ request.GET.q }}"
+             class="flex-grow px-4 py-2 border-2 border-indigo-200 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition">
+      <button type="submit"
+              class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+        جستجو
+      </button>
+    </form>
+  </section>
+
+  <!-- Consultant List -->
+<section class="px-6">
+  {% if request.GET.q %}
+    <p class="text-center text-sm text-gray-600 mb-4">
+      نتایج جستجو برای "<strong>{{ request.GET.q }}</strong>"
+    </p>
+  {% endif %}
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {% for consultant in consultants %}
+      <div class="bg-white rounded-2xl shadow-lg transform hover:scale-105 transition duration-300 fade-card p-6 flex flex-col justify-between text-center">
+        <div>
+          <h3 class="text-lg font-bold text-indigo-800 mb-2">{{ consultant.full_name }}</h3>
+          <p class="text-sm text-gray-600 mb-4">{{ consultant.specialty }}</p>
+        </div>
+        <a href="{% url 'consultant-profile' consultant.id %}"
+           class="inline-block bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition">
+          مشاهده پروفایل
+        </a>
+      </div>
+    {% empty %}
+      <p class="col-span-full text-center text-gray-500">مشاوری یافت نشد.</p>
+    {% endfor %}
+  </div>
+</section>
+
+  <script>
+    $(document).ready(function () {
+      // انیمیشن fade in برای کارت‌ها
+      $(".fade-card").hide().each(function (i) {
+        $(this).delay(i * 150).fadeIn(400);
+      });
+    });
+  </script>
+
+</body>
+</html>
