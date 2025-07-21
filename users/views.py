@@ -1,9 +1,13 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.views import View
+from django.urls import reverse
 from .models import UserProfile 
-from consultant.models import ConsultantProfile
+from consultant.models import ConsultantProfile ,AvailableTime
+from appointments.models import Appointment
 from django.contrib.auth.hashers import check_password , make_password
+from django.contrib import messages
+from django.utils.timezone import now
 import re
 
 
@@ -24,7 +28,7 @@ class RegistrationView(View):
 
             username = request.POST.get('username')
             password = request.POST.get('password')
-            phonenumber = request.POST.get('phoneNumber')
+            phonenumber = request.POST.get('phone_number')
             confirm_password = request.POST.get("confirm_password")
 
 
@@ -58,8 +62,8 @@ class RegistrationView(View):
 
         elif act and act.strip() == "ورود":
 
-            username = request.POST.get('chusername')
-            password = request.POST.get('chpassword')
+            username = request.POST.get('check_username')
+            password = request.POST.get('check_password')
 
             if not (username and password):
                 msg = 'لطفا تمامی فیلد ها را پر کنید'
@@ -70,9 +74,8 @@ class RegistrationView(View):
             if user and check_password(password, user.password):
                 request.session["user_id"] = user.id  
                 request.session.modified = True
-                #return redirect() main page
-                return render(request, 'users/reg.html', {'msg': 'با موفقیت وارد شدید'}) 
-
+                messages.success(request, "عملیات با موفقیت انجام شد.")
+                return redirect("user_dashboard")
             return render(request, 'users/reg.html', {'msg': 'نام کاربری / رمز عبور نادرست است'})
 
         else:
@@ -84,7 +87,7 @@ class UserUpdateView(View):
 
     def get(self,request):
         if not is_logged(request) :
-            return redirect("user-login")
+            return redirect("user_login")
         
         user = UserProfile.objects.filter(id=request.session.get("user_id")).first()
         if not user:
@@ -94,7 +97,7 @@ class UserUpdateView(View):
     
     def post(self,request):
         if not is_logged(request) :
-            return redirect("user-login")
+            return redirect("user_login")
         
         user = UserProfile.objects.filter(id=request.session.get("user_id")).first()
         if not user:
@@ -102,8 +105,8 @@ class UserUpdateView(View):
 
         username= request.POST.get("username")
         email = request.POST.get("email")
-        phonenumber = request.POST.get("phoneNumber")
-        fullname = request.POST.get("fullname")
+        phonenumber = request.POST.get("phone_number")
+        fullname = request.POST.get("full_name")
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
 
@@ -132,23 +135,66 @@ class UserUpdateView(View):
             user.username=username
             user.email = email
             user.phoneNumber = phonenumber
-            user.fullname = fullname 
+            user.fullName = fullname 
             if password:
                 user.password = make_password(password)
 
             user.save()
-            msg = "اطلاعات با موفقیت بروزرسانی شد"
+            messages.success(request, "عملیات با موفقیت انجام شد.")
+            return redirect("user_dashboard")
 
         return render(request, 'users/update.html',{'user':user , 'msg':msg})
 
 class UserDashboardView(View):
     def get(self, request):
         if not is_logged(request):
-            return redirect("user-login")
+            return redirect("user_login")
 
         user_id = request.session.get('user_id')
         user =UserProfile.objects.filter(id=user_id).first()
         if not user:
             return render(request, 'users/dashboard.html', {'msg':'کاربری یافت نشد'})
 
-        return render(request, 'users/dashboard.html', {'fullname':user.fullname})
+        return render(request, 'users/dashboard.html', {'fullname':user.fullName})
+    
+class UserAppointmentsView(View):
+    def get(self, request):
+        if not is_logged(request):
+            return redirect("user_login")
+        user = UserProfile.objects.get(id=request.session['user_id'])
+        appointments = Appointment.objects.filter(user=user).select_related("availableTime", "consultant").order_by('-bookedAt')
+        return render(request, 'users/userAppointments.html', {'appointments': appointments})
+
+
+class ConsultantAvailableTimesView(View):
+    def get(self, request, consultant_id):
+        if not is_logged(request) :
+            return redirect("user_login")
+        consultant = ConsultantProfile.objects.filter(id=consultant_id).first()
+        available_times = AvailableTime.objects.filter(consultant=consultant, isActive=True, startTime__gte=now()).order_by('startTime')
+        return render(request, 'users/reservationList.html', {'consultant': consultant,'available_times': available_times})
+
+    def post(self, request, consultant_id):
+        if not is_logged(request) :
+            return redirect("user_login")
+        
+        user = UserProfile.objects.filter(id=request.session.get('user_id')).first()
+        consultant = ConsultantProfile.objects.filter(id=consultant_id).first()
+        time_id = request.POST.get('time_id')
+        available_time = AvailableTime.objects.filter(id=time_id, isActive=True).first()
+
+        if not available_time:
+            messages.error(request, 'این نوبت دیگر در دسترس نیست.')
+            return redirect('reservation_list', consultant_id=consultant_id)
+
+
+        Appointment.objects.create(
+            user=user,
+            consultant=consultant,
+            availableTime=available_time,
+        )
+        available_time.isActive = False
+        available_time.save()
+
+        messages.success(request, 'نوبت شما با موفقیت رزرو شد.')
+        return redirect('reservation_list', consultant_id=consultant_id)

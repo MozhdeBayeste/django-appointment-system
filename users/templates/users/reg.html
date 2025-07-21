@@ -16,7 +16,6 @@
     {% endif %}
   <h2 class="text-center text-2xl font-bold text-gray-700 mb-6" id="formTitle">ورود به حساب کاربری</h2>
 
-  <!-- فرم ثبت نام -->
   <form method="post" class="hidden" id="signupForm">
     {% csrf_token %}
     <div>
@@ -25,7 +24,7 @@
     </div>
     <div>
       <label class="block text-sm font-medium text-gray-600">شماره تماس</label>
-      <input type="text" name="phoneNumber" class="w-full border rounded p-2 focus:outline-none focus:ring" placeholder="0912..." required>
+      <input type="text" name="phone_number" class="w-full border rounded p-2 focus:outline-none focus:ring" placeholder="0912..." required>
     </div>
     <div>
       <label class="block text-sm font-medium text-gray-600">رمز عبور</label>
@@ -38,16 +37,15 @@
     <input type="submit" value="ثبت نام" name="act" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded transition duration-300">
   </form>
 
-  <!-- فرم ورود -->
   <form method="post" class="space-y-4" id="loginForm">
     {% csrf_token %}
     <div>
       <label class="block text-sm font-medium text-gray-600">نام کاربری</label>
-      <input type="text" name="chusername" class="w-full border rounded p-2 focus:outline-none focus:ring" placeholder="نام کاربری" required>
+      <input type="text" name="check_username" class="w-full border rounded p-2 focus:outline-none focus:ring" placeholder="نام کاربری" required>
     </div>
     <div>
       <label class="block text-sm font-medium text-gray-600">رمز عبور</label>
-      <input type="password" name="chpassword" class="w-full border rounded p-2 focus:outline-none focus:ring" placeholder="رمز عبور" required>
+      <input type="password" name="check_password" class="w-full border rounded p-2 focus:outline-none focus:ring" placeholder="رمز عبور" required>
     </div>
     <input type="submit" value="ورود" name="act" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded transition duration-300">
   </form>

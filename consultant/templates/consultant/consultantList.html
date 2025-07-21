@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>لیست مشاوران</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+
+  <div class="max-w-6xl mx-auto py-10 px-4">
+
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">لیست مشاوران</h1>
+
+    <form method="get" class="max-w-md mx-auto mb-10">
+      <div class="relative">
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="جستجو براساس نام یا تخصص..."
+               class="w-full border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <button type="submit" class="absolute left-2 top-2.5 text-gray-500 hover:text-blue-600">
+          🔍
+        </button>
+      </div>
+    </form>
+
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+
+      {% for consultant in consultants %}
+        <div class="bg-white rounded-xl shadow-md p-5 transition duration-300 hover:scale-[1.03] hover:shadow-lg animate-fade-in">
+          <div class="flex flex-col items-center">
+            <div class="w-20 h-20 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl font-bold mb-3">
+              {{ consultant.fullName|default:"?"|slice:":1" }}
+            </div>
+            <h2 class="text-lg font-semibold text-gray-800">{{ consultant.fullName }}</h2>
+            <p class="text-sm text-gray-600 mt-1">{{ consultant.specialty }}</p>
+            <p class="text-xs text-gray-400 mt-2">ایجاد شده در {{ consultant.createdTime|date:"Y/m/d" }}</p>
+
+            <a href="{% url 'consultant_profile' consultant.id %}" class="mt-4 text-blue-500 hover:text-blue-700 font-medium">مشاهده جزئیات</a>
+          </div>
+        </div>
+      {% empty %}
+        <p class="col-span-full text-center text-gray-500">هیچ مشاوری پیدا نشد.</p>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <style>
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fade-in 0.5s ease-out;
+    }
+  </style>
+
+</body>
+</html>

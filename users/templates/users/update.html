@@ -27,7 +27,7 @@
 
         <div>
             <label class="block mb-1 text-sm font-medium text-gray-700">نام کامل:</label>
-            <input type="text" name="fullname" placeholder="نام کامل" value="{{ user.fullname|default_if_none:'' }}" class="w-full border rounded px-4 py-2">
+            <input type="text" name="full_name" placeholder="نام کامل" value="{{ user.fullname|default_if_none:'' }}" class="w-full border rounded px-4 py-2">
         </div>
 
         <div>
@@ -37,7 +37,7 @@
 
         <div>
             <label class="block mb-1 text-sm font-medium text-gray-700">شماره تماس:</label>
-            <input type="text" name="phoneNumber" placeholder="شماره تماس" value="{{ user.phoneNumber|default_if_none:'' }}" class="w-full border rounded px-4 py-2">
+            <input type="text" name="phone_number" placeholder="شماره تماس" value="{{ user.phoneNumber|default_if_none:'' }}" class="w-full border rounded px-4 py-2">
         </div>
 
         <div>

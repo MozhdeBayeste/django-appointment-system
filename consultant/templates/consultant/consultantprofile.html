@@ -15,7 +15,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-lg text-gray-700">
       <div class="flex items-center gap-3">
         <span class="font-bold text-blue-600">نام کامل:</span>
-        <span>{{ consultant.full_name }}</span>
+        <span>{{ consultant.fullName }}</span>
       </div>
 
       <div class="flex items-center gap-3">
@@ -40,13 +40,12 @@
     </div>
 
     <div class="flex flex-col md:flex-row justify-between gap-4 mt-8">
-      <a href="{% url 'home' %}" class="w-full md:w-auto text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition">
-        بازگشت به صفحه اصلی
+      <a href="{% url 'consultant_list' %}" class="w-full md:w-auto text-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition">
+        لیست مشاوران
       </a>
 
-      <a href="" class="w-full md:w-auto text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+      <a href="{% url 'reservation_list' consultant.id %}" class="w-full md:w-auto text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">
         دیدن نوبت‌های مشاور
-        {% comment %} {% url 'consultant-available-times' consultant.id %} {% endcomment %}
       </a>
     </div>
   </div>

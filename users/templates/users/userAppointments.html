@@ -1,0 +1,38 @@
+
+<!DOCTYPE html><html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>نوبت‌های من</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+  <div class="max-w-5xl mx-auto py-8 px-4">
+    <h1 class="text-2xl font-bold text-center mb-6">📅 نوبت‌های من</h1>
+
+    <div class="bg-white rounded shadow overflow-x-auto">
+      <table class="w-full text-center text-sm">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="py-2">تاریخ</th>
+            <th>ساعت</th>
+            <th>مشاور</th>
+            <th>رزرو در</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in appointments %}
+            <tr class="border-b hover:bg-gray-50 transition">
+              <td class="py-2">{{ app.availableTime.startTime|date:"Y/m/d" }}</td>
+              <td>{{ app.availableTime.startTime|time:"H:i" }} - {{ app.availableTime.endTime|time:"H:i" }}</td>
+              <td>{{ app.consultant.fullName }}</td>
+              <td>{{ app.bookedAt|date:"Y/m/d H:i" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="py-4 text-gray-500">نوبتی یافت نشد.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

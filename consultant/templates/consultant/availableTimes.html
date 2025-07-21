@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>نوبت‌های آزاد</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+  <div class="max-w-5xl mx-auto py-8 px-4">
+    <h1 class="text-2xl font-bold text-center mb-6">🗓 نوبت‌های آزاد</h1>
+
+    <!-- فیلتر تاریخ -->
+    <form method="get" class="flex justify-center gap-4 mb-6">
+      <select name="filter" onchange="this.form.submit()" class="border rounded px-3 py-2">
+        <option value="">همه</option>
+        <option value="today" {% if filter == 'today' %}selected{% endif %}>امروز</option>
+        <option value="week" {% if filter == 'week' %}selected{% endif %}>این هفته</option>
+        <option value="month" {% if filter == 'month' %}selected{% endif %}>این ماه</option>
+      </select>
+    </form>
+
+    <!-- جدول نوبت‌ها -->
+    <div class="bg-white rounded shadow overflow-x-auto">
+      <table class="w-full text-center text-sm">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="py-2">تاریخ</th>
+            <th>از ساعت</th>
+            <th>تا ساعت</th>
+            <th>یادداشت</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for time in available_times %}
+            <tr class="border-b hover:bg-gray-50 transition">
+              <td class="py-2">{{ time.startTime|date:"Y/m/d" }}</td>
+              <td>{{ time.startTime|time:"H:i" }}</td>
+              <td>{{ time.endTime|time:"H:i" }}</td>
+              <td>{{ time.note|default:"-" }}</td>
+              <td>
+                <form method="post" onsubmit="return confirm('آیا از حذف این نوبت مطمئن هستید؟')">
+                  {% csrf_token %}
+                  <input type="hidden" name="time_id" value="{{ time.id }}">
+                  <input type="hidden" name="act" value="حذف">
+                  <button type="submit" class="bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-3 rounded">حذف</button>
+                </form>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="py-4 text-gray-500">نوبتی یافت نشد.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</body>
+</html>

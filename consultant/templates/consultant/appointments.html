@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>نوبت‌های رزرو شده</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+  <div class="max-w-5xl mx-auto py-8 px-4">
+    <h1 class="text-2xl font-bold text-center mb-6">📋 نوبت‌های رزرو شده</h1>
+
+
+    <form method="get" class="flex justify-center gap-4 mb-6">
+      <select name="filter" onchange="this.form.submit()" class="border rounded px-3 py-2">
+        <option value="">همه</option>
+        <option value="today" {% if filter == 'today' %}selected{% endif %}>امروز</option>
+        <option value="week" {% if filter == 'week' %}selected{% endif %}>این هفته</option>
+        <option value="month" {% if filter == 'month' %}selected{% endif %}>این ماه</option>
+      </select>
+    </form>
+
+
+    <div class="bg-white rounded shadow overflow-x-auto">
+      <table class="w-full text-sm text-center">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="py-2">کاربر</th>
+            <th>تاریخ</th>
+            <th>ساعت</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for appt in appointments %}
+            <tr class="border-b hover:bg-gray-50">
+              <td class="py-2">{{ appt.user.fullName }}</td>
+              <td>{{ appt.availableTime.startTime|date:"Y/m/d" }}</td>
+              <td>{{ appt.availableTime.startTime|time:"H:i" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="py-4 text-gray-500">هیچ نوبتی رزرو نشده.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</body>
+</html>
