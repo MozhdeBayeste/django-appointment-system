@@ -18,4 +18,4 @@ class UserProfile(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f" {self.username} ,{self.phoneNumber},{self.email},{self.fullname}"
+        return f" {self.username} ,{self.phoneNumber},{self.email},{self.fullName}"

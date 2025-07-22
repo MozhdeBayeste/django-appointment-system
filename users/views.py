@@ -149,13 +149,11 @@ class UserDashboardView(View):
     def get(self, request):
         if not is_logged(request):
             return redirect("user_login")
-
-        user_id = request.session.get('user_id')
-        user =UserProfile.objects.filter(id=user_id).first()
+        user =UserProfile.objects.filter(id=request.session.get('user_id')).first()
         if not user:
             return render(request, 'users/dashboard.html', {'msg':'کاربری یافت نشد'})
 
-        return render(request, 'users/dashboard.html', {'fullname':user.fullName})
+        return render(request, 'users/dashboard.html', {'username':user.username})
     
 class UserAppointmentsView(View):
     def get(self, request):
@@ -187,7 +185,12 @@ class ConsultantAvailableTimesView(View):
             messages.error(request, 'این نوبت دیگر در دسترس نیست.')
             return redirect('reservation_list', consultant_id=consultant_id)
 
+        future_appointments = Appointment.objects.filter(user=user,availableTime__startTime__gt=now()).count()
 
+        if future_appointments >= 2:
+            messages.warning(request, 'شما حداکثر دو نوبت فعال در آینده می‌توانید داشته باشید.')
+            return redirect('reservation_list', consultant_id=consultant_id)
+        
         Appointment.objects.create(
             user=user,
             consultant=consultant,

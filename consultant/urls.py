@@ -8,6 +8,6 @@ urlpatterns = [
     path('<int:pk>/', views.ConsultantProfileView.as_view(), name='consultant_profile'),
     path('dashboard/', views.ConsultantDashboardView.as_view(), name='consultant_dashboard'),
     path('consultant-list/', views.ConsultantListView.as_view(), name='consultant_list'),
-    path('available-times/', views.AvailableTimeListView.as_view(), name='consultant_available_times'),
+    path('availabletimes/', views.AvailableTimeListView.as_view(), name='consultant_available_times'),
     path('appointments/', views.AppointmentListView.as_view(), name='consultant_appointments'),
 ]

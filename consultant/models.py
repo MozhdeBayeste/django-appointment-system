@@ -17,7 +17,7 @@ class ConsultantProfile(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f" {self.full_name} ,{self.phoneNumber},{self.email},{self.is_active}"
+        return f" {self.fullName} ,{self.phoneNumber},{self.email},{self.isActive}"
 
 class AvailableTime(models.Model):
     consultant = models.ForeignKey(ConsultantProfile, on_delete=models.CASCADE)
@@ -27,4 +27,4 @@ class AvailableTime(models.Model):
     note = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.consultant.full_name} , {self.start_time} , {self.end_time} , {self.is_active}"
+        return f"{self.consultant.fullName} , {self.startTime} , {self.endTime} , {self.isActive}"
